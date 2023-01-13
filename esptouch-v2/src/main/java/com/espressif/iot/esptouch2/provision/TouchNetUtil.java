@@ -60,11 +60,12 @@ public class TouchNetUtil {
 
     public static InetAddress getBroadcastAddress(WifiManager wifi, ConnectivityManager connectivity) {
         Network network = connectivity.getActiveNetwork();
-        int netmask = getNetmaskFromLinkProperties(connectivity.getLinkProperties(network));
+        LinkAddress linkAddr = getLinkAddressFromLinkProperties(connectivity.getLinkProperties(network));
+        if (linkAddr != null) {
+            int netmask = getNetmaskFromLinkAddress(linkAddr);
+            int ipAddress = getIpAddressFromLinkAddress(linkAddr);
 
-        DhcpInfo dhcp = wifi.getDhcpInfo();
-        if (dhcp != null) {
-            int broadcast = (dhcp.ipAddress & netmask) | ~netmask;
+            int broadcast = (ipAddress & netmask) | ~netmask;
             byte[] quads = new byte[4];
             for (int k = 0; k < 4; k++) {
                 quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
@@ -85,16 +86,28 @@ public class TouchNetUtil {
         return null;
     }
 
-    private static  int getNetmaskFromLinkProperties(LinkProperties linkProperties) {
+    private static LinkAddress getLinkAddressFromLinkProperties(LinkProperties linkProperties) {
         List<LinkAddress> addresses = linkProperties.getLinkAddresses();
         for (LinkAddress address : addresses) {
-            InetAddress inetAddress = address.getAddress();
-            if (inetAddress instanceof Inet4Address) {
-                int prefix = address.getPrefixLength();
-                return 0xFFFFFFFF << (32 - prefix);
+            if (address.getAddress() instanceof Inet4Address) {
+                return address;
             }
         }
-        return 0xFFFFFFFF;
+        return null;
+    }
+
+    private static int getNetmaskFromLinkAddress(LinkAddress address) {
+        int prefix = address.getPrefixLength();
+        return 0xFFFFFFFF << (32 - prefix);
+    }
+
+    private static int getIpAddressFromLinkAddress(LinkAddress address) {
+        int result = 0;
+        for (byte b : address.getAddress().getAddress()) {
+            result <<= 8;
+            result |= b;
+        }
+        return result;
     }
 
     public static boolean is5G(int frequency) {
