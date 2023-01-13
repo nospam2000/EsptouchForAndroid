@@ -105,7 +105,7 @@ public class TouchNetUtil {
         int result = 0;
         for (byte b : address.getAddress().getAddress()) {
             result <<= 8;
-            result |= b;
+            result |= b & 0xFF;
         }
         return result;
     }
