@@ -68,7 +68,7 @@ public class TouchNetUtil {
             int broadcast = (ipAddress & netmask) | ~netmask;
             byte[] quads = new byte[4];
             for (int k = 0; k < 4; k++) {
-                quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
+                quads[k] = (byte) ((broadcast >> (3 - k) * 8) & 0xFF);
             }
             try {
                 return InetAddress.getByAddress(quads);
