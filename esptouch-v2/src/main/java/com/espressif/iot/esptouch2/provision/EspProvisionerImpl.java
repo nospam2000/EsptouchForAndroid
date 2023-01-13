@@ -3,6 +3,7 @@ package com.espressif.iot.esptouch2.provision;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.SystemClock;
 import android.util.Log;
@@ -58,7 +59,9 @@ class EspProvisionerImpl implements IEspProvisioner {
         checkPermissions(context);
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         assert wm != null;
-        mBroadcastAddress = TouchNetUtil.getBroadcastAddress(wm);
+        ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert cm != null;
+        mBroadcastAddress = TouchNetUtil.getBroadcastAddress(wm, cm);
 //        if (mBroadcastAddress == null) {
 //            try {
 //                mBroadcastAddress = InetAddress.getByName("255.255.255.255");

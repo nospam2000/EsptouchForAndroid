@@ -6,7 +6,7 @@ android {
     namespace "com.espressif.esptouch.android"
     defaultConfig {
         applicationId "com.espressif.esptouch.android"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 32
         versionCode 30
         versionName "v2.3.2"

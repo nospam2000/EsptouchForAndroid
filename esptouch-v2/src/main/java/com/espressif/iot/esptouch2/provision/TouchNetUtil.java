@@ -1,6 +1,10 @@
 package com.espressif.iot.esptouch2.provision;
 
+import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -14,6 +18,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.List;
 
 public class TouchNetUtil {
     public static boolean isWifiConnected(WifiManager wifiManager) {
@@ -53,10 +58,13 @@ public class TouchNetUtil {
         return ssid;
     }
 
-    public static InetAddress getBroadcastAddress(WifiManager wifi) {
+    public static InetAddress getBroadcastAddress(WifiManager wifi, ConnectivityManager connectivity) {
+        Network network = connectivity.getActiveNetwork();
+        int netmask = getNetmaskFromLinkProperties(connectivity.getLinkProperties(network));
+
         DhcpInfo dhcp = wifi.getDhcpInfo();
         if (dhcp != null) {
-            int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
+            int broadcast = (dhcp.ipAddress & netmask) | ~netmask;
             byte[] quads = new byte[4];
             for (int k = 0; k < 4; k++) {
                 quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
@@ -75,6 +83,18 @@ public class TouchNetUtil {
         }
         // Impossible arrive here
         return null;
+    }
+
+    private static  int getNetmaskFromLinkProperties(LinkProperties linkProperties) {
+        List<LinkAddress> addresses = linkProperties.getLinkAddresses();
+        for (LinkAddress address : addresses) {
+            InetAddress inetAddress = address.getAddress();
+            if (inetAddress instanceof Inet4Address) {
+                int prefix = address.getPrefixLength();
+                return 0xFFFFFFFF << (32 - prefix);
+            }
+        }
+        return 0xFFFFFFFF;
     }
 
     public static boolean is5G(int frequency) {
