@@ -26,7 +26,7 @@
     <string name="esptouch1_configure_wifi_change_message">Wi-Fi disconnected or changed</string>
     <string name="esptouch1_configure_result_failed">EspTouch failed</string>
     <string name="esptouch1_configure_result_failed_port">Create EspTouch task failed, the EspTouch port could be used by other thread</string>
-    <string name="esptouch1_configure_result_success">EspTouch 完成</string>
+    <string name="esptouch1_configure_result_success">EspTouch Complete</string>
     <string name="esptouch1_configure_result_success_item">BSSID = %1$s, InetAddress = %2$s</string>
 
     <string name="esptouch2_title">EspTouch V2</string>
@@ -38,6 +38,10 @@
     <string name="esptouch2_aes_key">AES Key</string>
     <string name="esptouch2_aes_key_error">AES Key must be null or 16 bytes data</string>
     <string name="esptouch2_custom_data">Custom Data</string>
+    <string name="esptouch2_mqtt_host">MQTT Host</string>
+    <string name="esptouch2_mqtt_port">MQTT Port</string>
+    <string name="esptouch2_mqtt_user">MQTT User</string>
+    <string name="esptouch2_mqtt_password">MQTT Password</string>
     <string name="esptouch2_custom_data_error">Custom data can\'t be more than %d bytes</string>
     <string name="esptouch2_device_count">Device Count for Provisioning</string>
 

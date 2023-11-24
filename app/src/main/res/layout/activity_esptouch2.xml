@@ -11,7 +11,7 @@
         android:id="@+id/controlGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="apSsidLabel,apSsidText,apBssidLabel,apBssidText,ipLabel,ipText,apPasswordLayout,aesKeyLayout,customDataLayout,confirmBtn,deviceCountLayout" />
+        app:constraint_referenced_ids="apSsidLabel,apSsidText,apBssidLabel,apBssidText,ipLabel,ipText,apPasswordLayout,aesKeyLayout,mqttHostLayout,mqttPortLayout,mqttUserLayout,mqttPasswordLayout,confirmBtn,deviceCountLayout" />
 
     <TextView
         android:id="@+id/apSsidLabel"
@@ -138,18 +138,84 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/customDataLayout"
+        android:id="@+id/mqttHostLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:hint="@string/esptouch2_custom_data"
+        android:hint="@string/esptouch2_mqtt_host"
         app:layout_constraintTop_toBottomOf="@id/aesKeyLayout">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/customDataEdit"
+            android:id="@+id/mqttHostEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/mqttPortLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/esptouch2_mqtt_port"
+        app:layout_constraintTop_toBottomOf="@id/mqttHostLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/mqttPortEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/mqttUserLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/esptouch2_mqtt_user"
+        app:layout_constraintTop_toBottomOf="@id/mqttPortLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/mqttUserEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:id="@+id/mqttPasswordLayout"-->
+<!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:hint="@string/esptouch2_mqtt_password"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/mqttUserLayout">-->
+
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--            android:id="@+id/mqttPasswordEdit"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:singleLine="true" />-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/mqttPasswordLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/esptouch2_mqtt_password"
+        app:layout_constraintTop_toBottomOf="@id/mqttUserLayout"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/mqttPasswordEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
             android:singleLine="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -160,7 +226,7 @@
         android:layout_marginTop="8dp"
         android:gravity="top"
         android:textColor="@android:color/holo_red_dark"
-        app:layout_constraintTop_toBottomOf="@id/customDataLayout"
+        app:layout_constraintTop_toBottomOf="@id/mqttPasswordLayout"
         app:layout_goneMarginStart="4dp" />
 
     <com.google.android.material.button.MaterialButton
