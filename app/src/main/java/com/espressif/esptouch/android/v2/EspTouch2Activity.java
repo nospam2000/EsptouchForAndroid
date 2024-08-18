@@ -1,6 +1,7 @@
 package com.espressif.esptouch.android.v2;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,8 @@ public class EspTouch2Activity extends EspTouchActivityAbs {
     private int mMessageVisible;
     private int mControlVisible;
 
+    private Context mContext;
+
     private ActivityResultLauncher<Intent> mProvisionLauncher;
 
     @Override
@@ -72,6 +75,21 @@ public class EspTouch2Activity extends EspTouchActivityAbs {
         EspTouchApp.getInstance().observeBroadcast(this, action -> check());
 
         check();
+
+        mContext = this;
+        String wifiPassword = PreferenceManager.getString(mContext, "wifi_password");
+        mBinding.apPasswordEdit.setText(wifiPassword);
+        String wifiAES = PreferenceManager.getString(mContext, "wifi_aes");
+        mBinding.aesKeyEdit.setText(wifiAES);
+        String mqttHost = PreferenceManager.getString(mContext, "mqtt_host");
+        mBinding.mqttHostEdit.setText(mqttHost);
+        String mqttPort = PreferenceManager.getString(mContext, "mqtt_port");
+        mBinding.mqttPortEdit.setText(mqttPort);
+        String mqttUser = PreferenceManager.getString(mContext, "mqtt_user");
+        mBinding.mqttUserEdit.setText(mqttUser);
+        String mqttPassword = PreferenceManager.getString(mContext, "mqtt_password");
+        mBinding.mqttPasswordEdit.setText(mqttPassword);
+
     }
 
     @Override
@@ -176,25 +194,25 @@ public class EspTouch2Activity extends EspTouchActivityAbs {
         if (checkEnable()) {
             mControlVisible = View.VISIBLE;
             mMessageVisible = View.GONE;
-        } else {
-            mControlVisible = View.GONE;
-            mMessageVisible = View.VISIBLE;
-
-            if (mProvisioner != null) {
-                if (mProvisioner.isSyncing()) {
-                    mProvisioner.stopSync();
-                }
-                if (mProvisioner.isProvisioning()) {
-                    mProvisioner.stopProvisioning();
-                }
-            }
+//        } else {
+//            mControlVisible = View.GONE;
+//            mMessageVisible = View.VISIBLE;
+//
+//            if (mProvisioner != null) {
+//                if (mProvisioner.isSyncing()) {
+//                    mProvisioner.stopSync();
+//                }
+//                if (mProvisioner.isProvisioning()) {
+//                    mProvisioner.stopProvisioning();
+//                }
+//            }
         }
         invalidateAll();
     }
 
     private EspProvisioningRequest genRequest() {
         mBinding.aesKeyEdit.setError(null);
-        mBinding.customDataEdit.setError(null);
+//        mBinding.customDataEdit.setError(null);
 
         CharSequence aesKeyChars = mBinding.aesKeyEdit.getText();
         byte[] aesKey = null;
@@ -206,18 +224,31 @@ public class EspTouch2Activity extends EspTouchActivityAbs {
             return null;
         }
 
-        CharSequence customDataChars = mBinding.customDataEdit.getText();
+//        CharSequence customDataChars = mBinding.customDataEdit.getText();
+        CharSequence mqttHostChars = mBinding.mqttHostEdit.getText();
+        CharSequence mqttPortChars = mBinding.mqttPortEdit.getText();
+        CharSequence mqttUserChars = mBinding.mqttUserEdit.getText();
+        CharSequence mqttPasswordChars = mBinding.mqttPasswordEdit.getText();
+        CharSequence customDataChars = mqttHostChars + "/" + mqttPortChars + "/" + mqttUserChars + "/" + mqttPasswordChars;
         byte[] customData = null;
         if (customDataChars != null && customDataChars.length() > 0) {
             customData = customDataChars.toString().getBytes();
         }
         int customDataMaxLen = EspProvisioningRequest.RESERVED_LENGTH_MAX;
         if (customData != null && customData.length > customDataMaxLen) {
-            mBinding.customDataEdit.setError(getString(R.string.esptouch2_custom_data_error, customDataMaxLen));
+            mBinding.hintView.setText(getString(R.string.esptouch2_custom_data_error, customDataMaxLen));
             return null;
         }
 
         CharSequence password = mBinding.apPasswordEdit.getText();
+
+        PreferenceManager.setString(mContext, "wifi_password", password.toString());
+        PreferenceManager.setString(mContext, "wifi_aes", aesKeyChars.toString());
+        PreferenceManager.setString(mContext, "mqtt_host", mqttHostChars.toString());
+        PreferenceManager.setString(mContext, "mqtt_port", mqttPortChars.toString());
+        PreferenceManager.setString(mContext, "mqtt_user", mqttUserChars.toString());
+        PreferenceManager.setString(mContext, "mqtt_password", mqttPasswordChars.toString());
+
         return new EspProvisioningRequest.Builder(getApplicationContext())
                 .setSSID(mSsidBytes)
                 .setBSSID(getBssidBytes())
