@@ -1,6 +1,10 @@
 package com.espressif.iot.esptouch2.provision;
 
+import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
@@ -14,6 +18,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.List;
 
 public class TouchNetUtil {
     public static boolean isWifiConnected(WifiManager wifiManager) {
@@ -53,13 +58,17 @@ public class TouchNetUtil {
         return ssid;
     }
 
-    public static InetAddress getBroadcastAddress(WifiManager wifi) {
-        DhcpInfo dhcp = wifi.getDhcpInfo();
-        if (dhcp != null) {
-            int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
+    public static InetAddress getBroadcastAddress(WifiManager wifi, ConnectivityManager connectivity) {
+        Network network = connectivity.getActiveNetwork();
+        LinkAddress linkAddr = getLinkAddressFromLinkProperties(connectivity.getLinkProperties(network));
+        if (linkAddr != null) {
+            int netmask = getNetmaskFromLinkAddress(linkAddr);
+            int ipAddress = getIpAddressFromLinkAddress(linkAddr);
+
+            int broadcast = (ipAddress & netmask) | ~netmask;
             byte[] quads = new byte[4];
             for (int k = 0; k < 4; k++) {
-                quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
+                quads[k] = (byte) ((broadcast >> (3 - k) * 8) & 0xFF);
             }
             try {
                 return InetAddress.getByAddress(quads);
@@ -75,6 +84,30 @@ public class TouchNetUtil {
         }
         // Impossible arrive here
         return null;
+    }
+
+    private static LinkAddress getLinkAddressFromLinkProperties(LinkProperties linkProperties) {
+        List<LinkAddress> addresses = linkProperties.getLinkAddresses();
+        for (LinkAddress address : addresses) {
+            if (address.getAddress() instanceof Inet4Address) {
+                return address;
+            }
+        }
+        return null;
+    }
+
+    private static int getNetmaskFromLinkAddress(LinkAddress address) {
+        int prefix = address.getPrefixLength();
+        return 0xFFFFFFFF << (32 - prefix);
+    }
+
+    private static int getIpAddressFromLinkAddress(LinkAddress address) {
+        int result = 0;
+        for (byte b : address.getAddress().getAddress()) {
+            result <<= 8;
+            result |= b & 0xFF;
+        }
+        return result;
     }
 
     public static boolean is5G(int frequency) {

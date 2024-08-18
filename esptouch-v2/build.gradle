@@ -9,7 +9,7 @@ android {
 
     namespace "com.espressif.iot.esptouch2"
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdkVersion 32
 
         buildConfigField "String", "VERSION_NAME", "\"$libVersion\""
